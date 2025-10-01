@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ace Editor NLP Demo</title>
+  <style>
+    /* Editor styling */
+    #editor {
+      height: 300px;
+      width: 100%;
+      border: 1px solid #ccc;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      padding: 10px;
+    }
+
+    /* Entity styling for NLP highlighting */
+    .ner.person {
+      background-color: #e6f7d4; /* light green */
+      padding: 0 2px;
+      border-radius: 3px;
+    }
+
+    .ner.place {
+      background-color: #d4e6f1; /* light blue */
+      padding: 0 2px;
+      border-radius: 3px;
+    }
+
+    .ner.organization {
+      background-color: #f8d7da; /* light red */
+      padding: 0 2px;
+      border-radius: 3px;
+    }
+
+    .ner.date {
+      background-color: #fff3cd; /* light yellow */
+      padding: 0 2px;
+      border-radius: 3px;
+    }
+
+    .ner.url {
+      background-color: #f0f8ff; /* light cyan */
+      padding: 0 2px;
+      border-radius: 3px;
+    }
+
+    .ner.currency {
+      background-color: #f4cccc; /* light pink */
+      padding: 0 2px;
+      border-radius: 3px;
+    }
+
+    .ner.value {
+      background-color: #ffcc99; /* light orange */
+      padding: 0 2px;
+      border-radius: 3px;
+    }
+
+    .ner.email {
+      background-color: #cce5ff; /* light blue */
+      padding: 0 2px;
+      border-radius: 3px;
+    }
+
+    .ner.atMention {
+      background-color: #ffff99; /* light yellow */
+      padding: 0 2px;
+      border-radius: 3px;
+    }
+
+    .ner {
+      position: absolute;
+      z-index: 20;
+    }
+
+    /* Button styling */
+    .action-btn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .action-btn:hover {
+      background-color: #0056b3;
+    }
+
+    /* Container for the editor and button */
+    .editor-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .editor-description {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="editor-container">
+    <h1>Interactive NLP Demo with Ace Editor</h1>
+    <p class="editor-description">
+      Type in the editor below to see different NLP entities (e.g., persons, places, dates) highlighted in real-time.
+    </p>
+
+    <!-- Editor area -->
+    <div id="editor">jared man</div>
+
+    <!-- Button to trigger NLP highlighting -->
+    <button class="action-btn" id="highlightBtn">Highlight Entities</button>
+  </div>
+
+  <!-- Load Ace and other dependencies -->
+  <script type="module">
+    import ace from 'https://esm.sh/ace-builds/src-noconflict/ace';
+    import nlp from "https://esm.sh/compromise";
+    import * as b from "https://esm.sh/gh/MarketingPip/Ace_NLP_Plugin/";
+
+    // Initialize Ace editor
+    var editor = ace.edit('editor');
+    editor.setTheme('ace/theme/monokai');
+    editor.session.setMode('ace/mode/javascript');
+
+    // Define patterns for different entities
+    const patterns = {
+      "#Date+": "date",
+      "jared man": "person",          // Hardcoded pattern for "jared man"
+      "#Place+": "place",
+      "#Organization+": "organization",
+      "#Url+": "url",
+      "#PhoneNumber+": "phone",
+      "#AtMention+": "atMention",
+      "#Email+": "email",
+      "#Currency+": "currency",
+      "#Value+": "value",
+    };
+
+    // Function to highlight words using Ace editor and NLP
+    const highlightWords = ace.require('ace/plugin/yaml-validation');
+
+    // Function to apply highlighting
+    function applyHighlighting() {
+      editor.getSession().on('change', function () {
+        highlightWords(editor, patterns, nlp);
+      });
+      highlightWords(editor, patterns, nlp);
+    }
+
+    // Trigger NLP highlighting on button click
+    document.getElementById('highlightBtn').addEventListener('click', function () {
+      applyHighlighting();
+    });
+  </script>
+
+</body>
+</html>
