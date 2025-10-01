@@ -92,4 +92,7 @@ module.exports = {
   resolve: {
     extensions: ['.js'],
   },
+   externals: {
+    ace: 'ace', // ace will be assumed to be available globally
+  },
 };
