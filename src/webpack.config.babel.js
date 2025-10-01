@@ -59,7 +59,7 @@ module.exports = {
   entry: `./src/${packageData.FILENAME}.js`,
   output: {
     path: path.resolve(__dirname, '..', 'dist'),
-    filename: packageData.main.split("/").pop() + ".min.js",
+    filename: packageData.main.split("/").pop(),
     library: {
       type: 'module',
     },
