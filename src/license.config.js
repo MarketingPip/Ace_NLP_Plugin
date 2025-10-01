@@ -17,6 +17,6 @@ const LICENSE = `/**!
 
 const FILENAME = "index"; // used for output file name
 
-const packageCONFIG = {LICENSE,FILENAME};
+const packageCONFIG = {LICENSE,FILENAME, ...packageData};
 
 export default packageCONFIG;
