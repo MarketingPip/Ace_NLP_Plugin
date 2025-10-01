@@ -1,4 +1,11 @@
 // webpack.config.js
+    // Awaited dynamic imports for ES Modules
+    const fs = await import('fs');
+    const path = await import('path');
+    
+    const packageData = await import('./license.config.js');
+    
+    const TerserPlugin = await import('terser-webpack-plugin');
 
 if (typeof require !== 'undefined') {
     // CommonJS imports
@@ -9,13 +16,7 @@ if (typeof require !== 'undefined') {
     
     const TerserPlugin = require('terser-webpack-plugin');
   } else {
-    // Awaited dynamic imports for ES Modules
-    const fs = await import('fs');
-    const path = await import('path');
-    
-    const packageData = await import('./license.config.js');
-    
-    const TerserPlugin = await import('terser-webpack-plugin');
+
     
     // Use fs, path, packageData, and TerserPlugin here
   }
