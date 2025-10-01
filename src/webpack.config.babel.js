@@ -2,12 +2,12 @@ async function loadModules() {
   let fs, path, packageData, TerserPlugin;
   
   // Dynamically load modules
-  if (typeof module !== 'undefined' && module.exports) {
-    // CommonJS: Use dynamic imports instead of require()
-    fs = await import('fs');
-    path = await import('path');
-    packageData = await import('./license.config.js');
-    TerserPlugin = (await import('terser-webpack-plugin')).default;
+ if (typeof require !== 'undefined' && module.exports) {
+    // CommonJS: Use require()
+    fs = require('fs');
+    path = require('path');
+    packageData = require('./license.config.js');
+    TerserPlugin = require('terser-webpack-plugin');
   } else {
     // ESM environment: Use dynamic imports directly
     fs = await import('fs');
