@@ -3,16 +3,10 @@ Note / step for cutting release -
 update package.json FIRST with version - to keep updated version in license.
 THEN create build.
 */ 
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
 
-import fs from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const configPath = join(
-  dirname(fileURLToPath(import.meta.url)),
-  '../package.json'
-);
-const packageData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+const packageData = require( '../package.json'); 
 
 
 const REPONAME = `Emoji-Fallback.js`;
