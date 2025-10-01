@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ace Editor Plugin Demo with NLP Highlighting</title>
+  
+  <link rel="stylesheet" href="https://unpkg.com/@primer/css/dist/primer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/github.min.css">
+  <!-- Ace Editor styles -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.min.css">
+
+  <meta name="author" content="github.com/marketingpipeline">
+  <meta name="description" content="Ace Editor Plugin Live Demo with NLP Highlighting">
+  <meta name="keywords" content="ace editor, javascript, code editor, web editor, npm, opensource, github, frontend, plugin, customizable, NLP">
+
+  <meta property="og:title" content="Ace Editor Plugin Demo with NLP Highlighting" />
+  <meta property="og:description" content="Ace Editor Plugin Live Demo with NLP Highlighting" />
+
+  <style>
+ /* styling used for the YourProjectName.js - terminal demo(s) */   
+.repl {
+    text-shadow: none;
+    color: #333;
+    background: black;
+    padding: 0;
+    text-align: left;
+    width: 600px;
+    margin: 50px auto;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    overflow:hidden;
+}
+
+.repl code {
+    height: 200px;
+    overflow-y: scroll;
+}
+
+pre {
+    margin: 0;
+}
+
+.termino-console {
+    padding: 11px 16px;
+    display: block;
+}
+
+.termino-input-container {
+    display: flex;
+}
+
+.termino-input-container > * {
+    outline: none;
+    border: none;
+    white-space: pre-wrap;
+    font-family: monospace;
+    color: #444;
+    background: black;
+    min-height: 14px; /* minimum one line */
+    padding: 10px;
+    margin: 0;
+    border-radius: 0 0 3px 3px;
+}
+
+.termino-input {
+    flex: 1;
+    height: 100%; /* start off one line tall */
+    resize:none;
+}
+
+.termino-prompt { 
+    font-weight: bold;
+    padding: 8px 10px;
+}
+
+@media screen and (max-width : 800px) {
+    .repl {
+        width: 100%;
+    }
+}
+
+.lua {
+    resize:none;
+    overflow:hidden;
+}
+
+pre{
+  
+}
+
+.repl code{
+    scroll-behavior:smooth;
+}
+
+/* hide scrollbar but allow scrolling */
+.repl code {
+  -ms-overflow-style: none; /* for Internet Explorer, Edge */
+  scrollbar-width: none; /* for Firefox */
+  overflow-y: scroll; 
+}
+
+.repl code::-webkit-scrollbar {
+  display: none; /* for Chrome, Safari, and Opera */
+}
+
+.loading:after {
+  content: ' .';
+  animation: dots 1s steps(5, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% {
+    color: rgba(0,0,0,0);
+    text-shadow:
+      .25em 0 0 rgba(0,0,0,0),
+      .5em 0 0 rgba(0,0,0,0);
+  }
+  40% {
+    color: white;
+    text-shadow:
+      .25em 0 0 rgba(0,0,0,0),
+      .5em 0 0 rgba(0,0,0,0);
+  }
+  60% {
+    text-shadow:
+      .25em 0 0 white,
+      .5em 0 0 rgba(0,0,0,0);
+  }
+  80%, 100% {
+    text-shadow:
+      .25em 0 0 white,
+      .5em 0 0 white;
+  }
+}
+</style> 
+  <style>
+    #editor {
+      height: 300px;
+    }
+
+    .ner.person {
+      background-color: #e6f7d4;
+      /* light green */
+    }
+
+    .ner.place {
+      background-color: #d4e6f1;
+      /* light blue */
+    }
+
+    .ner.organization {
+      background-color: #f8d7da;
+      /* light red */
+    }
+
+    .ner.date {
+      background-color: #fff3cd;
+      /* light yellow */
+    }
+
+    .ner.url {
+      background-color: #fff3cd;
+      /* light yellow */
+    }
+
+    .ner.currency {
+      background-color: red;
+      /* light red */
+    }
+
+    .ner.value {
+      background-color: pink;
+      /* light pink */
+    }
+
+    .ner.email {
+      background-color: blue;
+      /* blue */
+    }
+
+    .ner.atMention {
+      background-color: yellow;
+    }
+
+    .ner.phone {
+      background-color: yellow;
+    }
+
+    .ner {
+      position: absolute;
+      z-index: 20;
+    }
+  </style>
+<style>
+ /* styling used  for the Termino.js - terminal demo(s) */   
+.repl {
+    text-shadow: none;
+    color: #333;
+    background: #f8f8f8;
+    padding: 0;
+    text-align: left;
+    width: 600px;
+    margin: 50px auto;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    overflow:hidden;
+}
+
+.repl code {
+    height: 200px;
+    overflow-y: scroll;
+}
+
+pre {
+    margin: 0;
+}
+
+.termino-console {
+    padding: 11px 16px;
+    display: block;
+}
+
+.termino-input-container {
+    display: flex;
+}
+
+.termino-input-container > * {
+    outline: none;
+    border: none;
+    white-space: pre-wrap;
+    font-family: monospace;
+    color: #444;
+    background: #f0f0f0;
+    min-height: 14px; /* minimum one line */
+    padding: 10px;
+    margin: 0;
+    border-radius: 0 0 3px 3px;
+    border-top: 1px solid #ddd;
+}
+
+.termino-input {
+    flex: 1;
+    height: 100%; /* start off one line tall */
+    padding-left: 0;
+}
+
+.termino-prompt {a
+    font-weight: bold;
+    padding: 8px 10px;
+}
+
+@media screen and (max-width : 800px) {
+
+    .repl {
+        width: 100%;
+    }
+
+}
+
+.lua {
+  resize:none;
+  overflow:hidden;
+}
+
+pre{
+     word-break: break-all;
+    white-space: pre-line;
+}
+
+.repl code{
+    scroll-behavior:smooth;
+}
+
+/* hide scrollbar but allow scrolling */
+.repl code {
+  -ms-overflow-style: none; /* for Internet Explorer, Edge */
+  scrollbar-width: none; /* for Firefox */
+  overflow-y: scroll; 
+}
+
+.repl code::-webkit-scrollbar {
+  display: none; /* for Chrome, Safari, and Opera */
+}
+
+
+.loading:after {
+  content: ' .';
+  animation: dots 1s steps(5, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% {
+    color: rgba(0,0,0,0);
+    text-shadow:
+      .25em 0 0 rgba(0,0,0,0),
+      .5em 0 0 rgba(0,0,0,0);}
+  40% {
+    color: white;
+    text-shadow:
+      .25em 0 0 rgba(0,0,0,0),
+      .5em 0 0 rgba(0,0,0,0);}
+  60% {
+    text-shadow:
+      .25em 0 0 white,
+      .5em 0 0 rgba(0,0,0,0);}
+  80%, 100% {
+    text-shadow:
+      .25em 0 0 white,
+      .5em 0 0 white;}}
+  </style>
+</head>
+<body>
+  <div class="color-bg-canvas-inset pb-6">
+    <header class="container-lg mx-auto p-responsive d-flex flex-items-center flex-wrap flex-md-nowrap pt-3 pb-6">
+      <div>
+        <a class="text-white mr-3" href="https://github.com/MarketingPipeline/Ace-Editor-Web-Component/wiki">Docs</a>
+        <a class="text-white mr-3" href="https://github.com/MarketingPipeline/Ace-Editor-Web-Component/blob/master/CHANGELOG.md">Changelog</a>
+        <a class="text-white mr-3" href="https://cdn.jsdelivr.net/gh/MarketingPipeline/Ace-Editor-Web-Component/">CDN</a>
+      </div>
+    </header>
+    <div class="container-lg mx-auto text-white py-6 p-responsive">
+      <h1 class="f00-light">Ace Editor Plugin Demo with NLP Highlighting</h1>
+      <p class="f3 mb-4">This demo showcases Ace Editor integrated with an NLP (Named Entity Recognition) plugin for highlighting text entities like people, places, dates, etc.</p>
+    </div>
+
+    <center><h3>Ace Editor with NLP Highlighting Demo</h3></center>
+
+    <section class="section--standalone" id="Example_AceEditor">
+      <div class="repl">
+        <!-- The Ace Editor container -->
+        <div id="editor" style="height: 300px; width: 100%;"></div>
+     
+   
+ 
+
+      <center><details><summary>View Source</summary>
+      <pre><code class="javascript hljs" style="text-align:left;">
+  <span class="hljs-comment">// Ace Editor Plugin Demo with NLP Highlighting</span>
+  <span class="hljs-keyword">import</span> ace <span class="hljs-keyword">from</span> <span class="hljs-string">'https://esm.sh/ace-builds/src-noconflict/ace'</span>;
+  <span class="hljs-keyword">import</span> nlp <span class="hljs-keyword">from</span> <span class="hljs-string">'https://esm.sh/compromise'</span>;
+  <span class="hljs-keyword">import</span> <span class="hljs-string">* as b</span> <span class="hljs-keyword">from</span> <span class="hljs-string">'https://esm.sh/gh/MarketingPip/Ace_NLP_Plugin/'</span>;
+
+  <span class="hljs-comment">// Initialize Ace Editor</span>
+  <span class="hljs-keyword">const</span> editor = ace.edit(<span class="hljs-string">'editor'</span>);
+
+  <span class="hljs-comment">// Set up the editor theme and language mode</span>
+  editor.setTheme(<span class="hljs-string">'ace/theme/monokai'</span>);
+  editor.session.setMode(<span class="hljs-string">'ace/mode/javascript'</span>);
+
+  <span class="hljs-comment">// NLP Patterns for highlighting</span>
+  <span class="hljs-keyword">const</span> patterns = {
+    <span class="hljs-string">'#Date+'</span>: <span class="hljs-string">'date'</span>,
+    <span class="hljs-string">'#Person+'</span>: <span class="hljs-string">'person'</span>,
+    <span class="hljs-string">'#Place+'</span>: <span class="hljs-string">'place'</span>,
+    <span class="hljs-string">'#Organization+'</span>: <span class="hljs-string">'organization'</span>,
+    <span class="hljs-string">'#Url+'</span>: <span class="hljs-string">'url'</span>,
+    <span class="hljs-string">'#PhoneNumber+'</span>: <span class="hljs-string">'phone'</span>,
+    <span class="hljs-string">'#AtMention+'</span>: <span class="hljs-string">'atMention'</span>,
+    <span class="hljs-string">'#Email+'</span>: <span class="hljs-string">'email'</span>,
+    <span class="hljs-string">'#Currency+'</span>: <span class="hljs-string">'currency'</span>,
+    <span class="hljs-string">'#Value+'</span>: <span class="hljs-string">'value'</span>,
+  };
+
+  <span class="hljs-comment">// Function to highlight text using NLP patterns</span>
+  <span class="hljs-keyword">const</span> highlightWords = ace.require(<span class="hljs-string">'ace/plugin/yaml-validation'</span>);
+
+  <span class="hljs-comment">// Monitor changes in the editor</span>
+  editor.getSession().on(<span class="hljs-string">'change'</span>, <span class="hljs-keyword">function</span> () {
+    highlightWords(editor, patterns, nlp);
+  });
+
+  <span class="hljs-comment">// Apply NLP highlighting initially</span>
+  highlightWords(editor, patterns, nlp);
+</code></pre>
+    </details>
+      </center>
+              </div>
+ </section>
+   </div>  
+  <!-- Ace Editor and NLP Highlighting Plugin -->
+  <script type="module">
+    import ace from 'https://esm.sh/ace-builds/src-noconflict/ace';
+    import nlp from 'https://esm.sh/compromise';
+    import * as b from 'https://esm.sh/gh/MarketingPip/Ace_NLP_Plugin/';
+
+    var editor = ace.edit('editor');
+
+    const highlightWords = ace.require('ace/plugin/yaml-validation');
+
+    const patterns = {
+      "#Date+": "date",
+      "jared man": "person",
+      "#Person+": "place",
+      "#Place+": "place",
+      "#Organization+": "organization",
+      "#Url+": "url",
+      "#PhoneNumber+": "phone",
+      "#AtMention+": "atMention",
+      "#Email+": "email",
+      "#Currency+": "currency",
+      "#Value+": "value",
+    };
+
+    editor.getSession().on('change', function () {
+      highlightWords(editor, patterns, nlp);
+    });
+
+    highlightWords(editor, patterns, nlp);
+  </script>
+</body>
+</html>
