@@ -1,20 +1,24 @@
 // webpack.config.js
 
 if (typeof require !== 'undefined') {
-  const fs = require('fs');
-  const path = require('path');
-  
-  const packageData = require('./license.config.js');
-  
-  const TerserPlugin = require('terser-webpack-plugin');
-} else {
-  import fs from 'fs';
-  import path from 'path';
-  
-  import packageData from './license.config.js';
-  
-  import TerserPlugin from 'terser-webpack-plugin';
-}
+    // CommonJS imports
+    const fs = require('fs');
+    const path = require('path');
+    
+    const packageData = require('./license.config.js');
+    
+    const TerserPlugin = require('terser-webpack-plugin');
+  } else {
+    // Awaited dynamic imports for ES Modules
+    const fs = await import('fs');
+    const path = await import('path');
+    
+    const packageData = await import('./license.config.js');
+    
+    const TerserPlugin = await import('terser-webpack-plugin');
+    
+    // Use fs, path, packageData, and TerserPlugin here
+  }
  
 class AddLicenseAfterTerserPlugin {
     constructor(options) {
