@@ -2,7 +2,7 @@ async function loadModules() {
   let fs, path, packageData, TerserPlugin;
   
   // Dynamically load modules
- if (typeof require !== 'undefined' && module.exports) {
+ if (typeof require !== 'undefined') {
     // CommonJS: Use require()
     fs = require('fs');
     path = require('path');
