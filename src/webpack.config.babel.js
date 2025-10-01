@@ -15,13 +15,6 @@ if (typeof require !== 'undefined') {
   
   import TerserPlugin from 'terser-webpack-plugin';
 }
-
-import fs from 'fs';
-import path from 'path';
-
-import packageData from './license.config.js';
-
-import TerserPlugin from 'terser-webpack-plugin';
  
 class AddLicenseAfterTerserPlugin {
     constructor(options) {
