@@ -61,7 +61,18 @@ You can see a live demo of this setup by including the following snippet in your
   }
 </style>
 
-<div id="editor">jared man</div>
+<div id="editor">John Doe met Jane Smith at the Eiffel Tower in Paris on 2023-08-15. 
+John is planning to visit his favorite restaurant, Le Gourmet Bistro, 
+which is located at 123 Rue de la Paix, Paris, France. 
+He booked the reservation through www.gourmetbistro.com and paid €100 for the meal.
+
+Jane's email address is jane.smith@example.com and she is working on a new project at Tech Innovations Inc.
+They both plan to attend the Global Tech Conference in New York on 2023-09-12.
+
+During their conversation, John mentioned his favorite investment is in $5000 worth of Tesla, Inc. stocks. 
+Jane said she saw a new article about Apple Inc. and plans to check it out later on her phone.
+
+John also asked Jane if she saw the post from @TechGiant about the latest tech trends.</div>
 
 <script type="module">
   import ace from 'https://esm.sh/ace-builds/src-noconflict/ace';
