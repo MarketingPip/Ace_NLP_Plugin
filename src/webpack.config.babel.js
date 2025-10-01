@@ -114,6 +114,7 @@ async function loadModules() {
 loadModules().then((webpackConfig) => {
   // Export the Webpack config after all async modules have been loaded
   module.exports = webpackConfig;
+   export default webpackConfig;
 }).catch(err => {
   console.error("Error loading modules:", err);
 });
