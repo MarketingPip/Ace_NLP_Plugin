@@ -1,4 +1,21 @@
 // webpack.config.js
+
+if (typeof require !== 'undefined') {
+  const fs = require('fs');
+  const path = require('path');
+  
+  const packageData = require('./license.config.js');
+  
+  const TerserPlugin = require('terser-webpack-plugin');
+} else {
+  import fs from 'fs';
+  import path from 'path';
+  
+  import packageData from './license.config.js';
+  
+  import TerserPlugin from 'terser-webpack-plugin';
+}
+
 import fs from 'fs';
 import path from 'path';
 
