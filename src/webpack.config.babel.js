@@ -57,6 +57,7 @@ class RemoveLicenseFilePlugin {
 
 module.exports = {
   entry: `./src/${packageData.FILENAME}.js`,
+  mode: 'production', // minifies, tree-shakes, etc.
   output: {
     path: path.resolve(__dirname, '..', 'dist'),
     filename: packageData.main.split("/").pop(),
