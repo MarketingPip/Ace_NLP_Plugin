@@ -1,5 +1,12 @@
-import 'core-js/stable/index.js';
-// import regeneratorRuntime from "regenerator-runtime";
+// Polyfills modern JavaScript features (ES6+) for older browsers.
+// Includes things like Promise, Map, Set, Array.from, Object.assign, etc.
+// This ensures that code using modern JS features runs in IE11 and other older environments.
+import 'core-js/stable/index.js';  
+
+// Polyfills support for async functions and generators in older browsers.
+// Babel transpiles async/await into generator functions that rely on regeneratorRuntime.
+// Without this, code using async/await would throw ReferenceError in browsers like IE11.
+import 'regenerator-runtime/runtime.js';
 
 ace.define('ace/plugin/yaml-validation', ['require', 'exports', 'module', 'ace/lib/dom', 'ace/lib/lang'], function (
   require
