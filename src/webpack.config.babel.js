@@ -102,4 +102,7 @@ module.exports = {
    externals: {
     ace: 'ace', // ace will be assumed to be available globally
   },
+ experiments: {
+    topLevelAwait: true,
+  },
 };
