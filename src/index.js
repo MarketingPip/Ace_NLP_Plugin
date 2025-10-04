@@ -50,3 +50,8 @@ if (prevMarkers) {
   return highlight
  
 });
+
+async function hello(){
+
+}
+await hello();
