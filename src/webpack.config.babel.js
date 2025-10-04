@@ -87,8 +87,7 @@ module.exports = {
       useBuiltIns: 'usage',
       corejs: 3,
     }]
-  ],
-  plugins: ['@babel/plugin-syntax-top-level-await']
+  ]
 },
         },
       },
