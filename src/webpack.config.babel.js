@@ -1,83 +1,98 @@
 // webpack.config.js
-// Supports both require (CJS) and import (ESM) environments
+import fs from 'fs';
+import path from 'path';
 
-async function getWebpackConfig() {
-  const isRequireEnv = typeof require !== 'undefined' && typeof module !== 'undefined';
+import packageData from './license.config.js';
 
-  // Conditionally load path and fs
-  const path = isRequireEnv ? require('path') : (await import('path')).default;
-  const fs = isRequireEnv ? require('fs') : (await import('fs')).default;
-
-  // Conditionally load TerserPlugin and license config
-  const TerserPlugin = isRequireEnv
-    ? require('terser-webpack-plugin')
-    : (await import('terser-webpack-plugin')).default;
-
-  const packageData = isRequireEnv
-    ? require('./license.config.js')
-    : (await import('./license.config.js')).default;
-
-  // Plugin to add license after minification
-  class AddLicenseAfterTerserPlugin {
-    constructor(options = {}) { this.options = options; }
+import TerserPlugin from 'terser-webpack-plugin';
+ 
+class AddLicenseAfterTerserPlugin {
+    constructor(options) {
+        this.options = options;
+    }
 
     apply(compiler) {
-      compiler.hooks.afterEmit.tap('AddLicenseAfterTerserPlugin', () => {
-        const outputPath = this.options.outputPath || compiler.options.output.path;
-        const outputFileName = this.options.outputFileName || compiler.options.output.filename;
-        const outputFilePath = path.join(outputPath, outputFileName);
+        compiler.hooks.afterEmit.tap('AddLicenseAfterTerserPlugin', compilation => {
+            const outputPath = this.options.outputPath || compiler.options.output.path;
+            const outputFileName = this.options.outputFileName || compiler.options.output.filename;
 
-        fs.readFile(outputFilePath, 'utf8', (err, data) => {
-          if (err) throw err;
-          const licenseText = `${packageData.LICENSE} `;
-          const newContent = licenseText + data;
-          fs.writeFile(outputFilePath, newContent, 'utf8', (err) => {
-            if (err) throw err;
-            console.log(`License added to ${outputFileName}`);
-          });
+            // Construct the full path to the output file
+            const outputFilePath = path.join(outputPath, outputFileName);
+
+            // Read the existing file content
+            fs.readFile(outputFilePath, 'utf8', (err, data) => {
+                if (err) throw err;
+
+                // Add your license text after minification (Terser)
+                const licenseText = `${packageData.LICENSE} `;
+
+                // Append license text to the existing file content
+                const newContent = licenseText + data;
+
+                // Write back the modified content to the output file
+                fs.writeFile(outputFilePath, newContent, 'utf8', err => {
+                    if (err) throw err;
+                    console.log(`License added to ${outputFileName}`);
+                });
+            });
         });
-      });
     }
-  }
+}
 
-  // Plugin to remove LICENSE.txt
-  class RemoveLicenseFilePlugin {
+// taken from https://github.com/webpack/webpack/issues/12506#issuecomment-1360810560
+class RemoveLicenseFilePlugin {
     apply(compiler) {
-      compiler.hooks.emit.tap('RemoveLicenseFilePlugin', (compilation) => {
-        for (const name in compilation.assets) {
-          if (name.endsWith('LICENSE.txt')) delete compilation.assets[name];
-        }
-      });
+        compiler.hooks.emit.tap("RemoveLicenseFilePlugin", (compilation) => {
+            // compliation has assets to output
+            // console.log(compilation.assets);
+            for (let name in compilation.assets) {
+                if (name.endsWith("LICENSE.txt")) {
+                    delete compilation.assets[name];
+                }
+            }
+        });
     }
-  }
+}
 
-  return {
-    entry: `./src/${packageData.FILENAME}.js`,
-    output: {
-      path: path.resolve(process.cwd(), 'dist'),
-      filename: packageData.main.split('/').pop(),
-      library: { type: 'module' },
+
+module.exports = {
+  entry: `./src/${packageData.FILENAME}.js`,
+  output: {
+    path: path.resolve(__dirname, '..', 'dist'),
+    filename: packageData.main.split("/").pop(),
+    library: {
+      type: 'module',
     },
-    experiments: { outputModule: true },
-    optimization: { minimizer: [new TerserPlugin({ extractComments: false })] },
-    plugins: [new RemoveLicenseFilePlugin(), new AddLicenseAfterTerserPlugin()],
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          exclude: /node_modules/,
-          use: { loader: 'babel-loader', options: { presets: ['@babel/preset-env'] } },
+  },
+  experiments: {
+    outputModule: true,
+  },
+  optimization: {
+    minimizer: [new TerserPlugin({
+      extractComments: false,
+    })],
+  },
+  plugins: [new RemoveLicenseFilePlugin(),  new AddLicenseAfterTerserPlugin({
+            // Additional options can be passed here if needed
+        })],
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+          },
         },
-      ],
-    },
-    resolve: { extensions: ['.js'] },
-    externals: { ace: 'ace' },
-  };
-}
-
-// Export for both require and import
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = getWebpackConfig();
-} else {
-  export default getWebpackConfig();
-}
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.js'],
+  },
+   externals: {
+    ace: 'ace', // ace will be assumed to be available globally
+  },
+};
