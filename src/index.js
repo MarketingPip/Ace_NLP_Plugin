@@ -1,3 +1,6 @@
+import 'core-js/stable'; // polyfills all stable ES features
+import 'regenerator-runtime/runtime'; // for async/await
+
 ace.define('ace/plugin/yaml-validation', ['require', 'exports', 'module', 'ace/lib/dom', 'ace/lib/lang'], function (
   require
 ) {
