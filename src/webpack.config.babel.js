@@ -65,9 +65,6 @@ module.exports = {
       type: 'module',
     },
   },
-  experiments: {
-    outputModule: true,
-  },
   optimization: {
     minimizer: [new TerserPlugin({
       extractComments: false,
