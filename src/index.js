@@ -1,5 +1,5 @@
 import 'core-js/stable/index.js';
-import regeneratorRuntime from "regenerator-runtime";
+// import regeneratorRuntime from "regenerator-runtime";
 
 ace.define('ace/plugin/yaml-validation', ['require', 'exports', 'module', 'ace/lib/dom', 'ace/lib/lang'], function (
   require
