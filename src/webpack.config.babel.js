@@ -66,9 +66,17 @@ module.exports = {
     },
   },
   optimization: {
-    minimizer: [new TerserPlugin({
-      extractComments: false,
-    })],
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: {
+            unused: true,
+            dead_code: true,
+          },
+        },
+      }),
+    ],
   },
   plugins: [new RemoveLicenseFilePlugin(),  new AddLicenseAfterTerserPlugin({
             // Additional options can be passed here if needed
