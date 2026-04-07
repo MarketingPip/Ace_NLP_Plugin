@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>#editor { height: 400px; width: 100%; border: 1px solid #ccc; }</style>
+</head>
+<body>
+
+<div id="editor">John Doe visited Paris in 2024. 
+He spent $50.00 at Apple. 
+The phone number is 555-1234.</div>
+
+<script type="module">
+    import ace from 'https://esm.sh/ace-builds';
+    import nlp from 'https://esm.sh/compromise';
+
+    const { TextHighlightRules } = ace.require("ace/mode/text_highlight_rules");
+    const { Mode: TextMode } = ace.require("ace/mode/text");
+
+    // 1. Logic to convert Compromise tags to Ace Standard Tokens
+    const getPatternsFromNLP = (text) => {
+        let doc = nlp(text);
+        let patterns = {};
+
+        // Map NLP entities to standard Ace colors
+        // #Person -> 'keyword' (Pink)
+        // #Place  -> 'string' (Yellow)
+        // #Money  -> 'constant.numeric' (Purple)
+        // #Organization -> 'support.function' (Aqua)
+        
+        doc.people().out('array').forEach(t => patterns[t] = "keyword");
+        doc.places().out('array').forEach(t => patterns[t] = "string");
+        doc.money().out('array').forEach(t => patterns[t] = "constant.numeric");
+        doc.organizations().out('array').forEach(t => patterns[t] = "support.function");
+
+        return patterns;
+    };
+
+    // 2. The Dynamic Rule Engine
+    class NlpHighlightRules extends TextHighlightRules {
+        constructor(patterns) {
+            super();
+            const rules = Object.keys(patterns).map(word => ({
+                token: patterns[word],
+                regex: `\\b${word}\\b` // Use word boundaries for accuracy
+            }));
+
+            this.$rules = { "start": [...rules, { defaultToken: "text" }] };
+        }
+    }
+
+    class NlpMode extends TextMode {
+        constructor(patterns) {
+            super();
+            this.HighlightRules = function() { return new NlpHighlightRules(patterns); };
+        }
+    }
+
+    // 3. Setup Editor
+    const editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+
+    // 4. Update Function: Runs NLP and refreshes the Highlighter
+    const runNlpUpdate = () => {
+        const text = editor.getValue();
+        const patterns = getPatternsFromNLP(text);
+        editor.session.setMode(new NlpMode(patterns));
+    };
+
+    // Initial Run
+    runNlpUpdate();
+
+    // Trigger update when user stops typing (debounced for performance)
+    let typingTimer;
+    editor.on("change", () => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(runNlpUpdate, 500); 
+    });
+</script>
+</body>
+</html>
