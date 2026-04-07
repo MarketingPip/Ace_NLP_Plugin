@@ -14,38 +14,58 @@ The phone number is 555-1234.</div>
     import ace from 'https://esm.sh/ace-builds';
     import nlp from 'https://esm.sh/compromise';
 
-    const { TextHighlightRules } = ace.require("ace/mode/text_highlight_rules");
+     
     const { Mode: TextMode } = ace.require("ace/mode/text");
-
+ const { TextHighlightRules } = ace.require("ace/mode/text_highlight_rules");
     // 1. Logic to convert Compromise tags to Ace Standard Tokens
     const getPatternsFromNLP = (text) => {
-        let doc = nlp(text);
+         let doc = nlp(text);
         let patterns = {};
 
-        // Map NLP entities to standard Ace colors
-        // #Person -> 'keyword' (Pink)
-        // #Place  -> 'string' (Yellow)
-        // #Money  -> 'constant.numeric' (Purple)
-        // #Organization -> 'support.function' (Aqua)
+       
         
-        doc.people().out('array').forEach(t => patterns[t] = "keyword");
-        doc.places().out('array').forEach(t => patterns[t] = "string");
-        doc.money().out('array').forEach(t => patterns[t] = "constant.numeric");
-        doc.organizations().out('array').forEach(t => patterns[t] = "support.function");
+      
+        // Use .json() to get exact text found for money
+        doc.organizations().json().forEach(m => {
+            patterns[m.text] = "support.function"; // Purple
+        });
+      
+      doc.money().json().forEach(m => {
+            patterns[escapeRegex(m.text)] = "constant.numeric"; // Purple
+        });
+
+        doc.people().json().forEach(p => {
+            patterns[p.text] = "keyword"; // Pink
+        });
+
+        doc.places().json().forEach(p => {
+           
+            patterns[p.text] = "keyword"; // Yellow
+        });
 
         return patterns;
     };
 
     // 2. The Dynamic Rule Engine
+    // Helper to escape regex special chars like $ or .
+    const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\ factory\\]/g, '\\$&');
+
+    
+
     class NlpHighlightRules extends TextHighlightRules {
         constructor(patterns) {
             super();
             const rules = Object.keys(patterns).map(word => ({
                 token: patterns[word],
-                regex: `\\b${word}\\b` // Use word boundaries for accuracy
+                regex: word // Regex is already escaped and ready
             }));
 
-            this.$rules = { "start": [...rules, { defaultToken: "text" }] };
+            this.$rules = { 
+                "start": [
+                    ...rules, 
+                    { defaultToken: "text" }
+                ] 
+            };
         }
     }
 
