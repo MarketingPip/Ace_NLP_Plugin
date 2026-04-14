@@ -11,91 +11,105 @@ He spent $50.00 at Apple.
 The phone number is 555-1234.</div>
 
 <script type="module">
-    import ace from 'https://esm.sh/ace-builds';
-    import nlp from 'https://esm.sh/compromise';
+import ace from 'https://esm.sh/ace-builds';
+import nlp from 'https://esm.sh/compromise';
 
-     
-    const { Mode: TextMode } = ace.require("ace/mode/text");
- const { TextHighlightRules } = ace.require("ace/mode/text_highlight_rules");
-    // 1. Logic to convert Compromise tags to Ace Standard Tokens
-    const getPatternsFromNLP = (text) => {
-         let doc = nlp(text);
-        let patterns = {};
+const { Mode: TextMode } = ace.require("ace/mode/text");
+const { TextHighlightRules } = ace.require("ace/mode/text_highlight_rules");
 
-       
-        
-      
-        // Use .json() to get exact text found for money
-        doc.organizations().json().forEach(m => {
-            patterns[m.text] = "support.function"; // Purple
+// 1. Map your custom names to Ace's built-in theme classes (Tokens)
+const tokenMap = {
+  "date": "constant.library",         // Blue/Teal
+  "person": "keyword",                // Pink
+  "place": "string",                  // Yellow
+  "organization": "support.function", // Purple
+  "url": "markup.underline",          // Underlined
+  "phone": "constant.numeric",        // Purple/Orange
+  "currency": "constant.numeric",     // Purple/Orange
+  "value": "variable"                 // Light Blue
+};
+
+// Your specific pattern object
+const patterns = {
+  "#Date+": "date",
+ // "jared man": "person",
+  "#Person+": "place",
+  "#Place+": "place",
+  "#Organization+": "organization",
+  "#Url+": "url",
+  "#PhoneNumber+": "phone",
+  "#AtMention+": "atMention",
+  "#Email+": "email",
+  "#Currency+": "currency",
+  "#Value+": "value",
+};
+
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\ factory\\]/g, '\\$&');
+
+// 2. The Logic: Convert the "patterns" keys into actual found words
+const getDynamicRules = (text) => {
+  const doc = nlp(text);
+  const activeRules = [];
+
+  Object.keys(patterns).forEach(key => {
+    const match = doc.match(key);
+    if (match.found) {
+      // Get unique text strings found for this pattern
+      const foundWords = match.out('array');
+      foundWords.forEach(word => {
+        activeRules.push({
+          token: tokenMap[patterns[key]] || "text",
+          regex: word
         });
-      
-      doc.money().json().forEach(m => {
-            patterns[escapeRegex(m.text)] = "constant.numeric"; // Purple
-        });
-
-        doc.people().json().forEach(p => {
-            patterns[p.text] = "keyword"; // Pink
-        });
-
-        doc.places().json().forEach(p => {
-           
-            patterns[p.text] = "keyword"; // Yellow
-        });
-
-        return patterns;
-    };
-
-    // 2. The Dynamic Rule Engine
-    // Helper to escape regex special chars like $ or .
-    const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\ factory\\]/g, '\\$&');
-
-    
-
-    class NlpHighlightRules extends TextHighlightRules {
-        constructor(patterns) {
-            super();
-            const rules = Object.keys(patterns).map(word => ({
-                token: patterns[word],
-                regex: word // Regex is already escaped and ready
-            }));
-
-            this.$rules = { 
-                "start": [
-                    ...rules, 
-                    { defaultToken: "text" }
-                ] 
-            };
-        }
+      });
     }
+  });
 
-    class NlpMode extends TextMode {
-        constructor(patterns) {
-            super();
-            this.HighlightRules = function() { return new NlpHighlightRules(patterns); };
-        }
-    }
+  return activeRules;
+};
 
-    // 3. Setup Editor
-    const editor = ace.edit("editor");
-    editor.setTheme("ace/theme/monokai");
-
-    // 4. Update Function: Runs NLP and refreshes the Highlighter
-    const runNlpUpdate = () => {
-        const text = editor.getValue();
-        const patterns = getPatternsFromNLP(text);
-        editor.session.setMode(new NlpMode(patterns));
+// 3. The Dynamic Rule Engine
+class NlpHighlightRules extends TextHighlightRules {
+  constructor(dynamicRules) {
+    super();
+    this.$rules = {
+      "start": [
+        ...dynamicRules,
+        { defaultToken: "text" }
+      ]
     };
+  }
+}
 
-    // Initial Run
-    runNlpUpdate();
+class NlpMode extends TextMode {
+  constructor(dynamicRules) {
+    super();
+    this.HighlightRules = function() {
+      return new NlpHighlightRules(dynamicRules);
+    };
+  }
+}
 
-    // Trigger update when user stops typing (debounced for performance)
-    let typingTimer;
-    editor.on("change", () => {
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(runNlpUpdate, 500); 
-    });
+// 4. Setup Editor
+const editor = ace.edit("editor");
+editor.setTheme("ace/theme/monokai");
+
+const runNlpUpdate = () => {
+  const text = editor.getValue();
+  const dynamicRules = getDynamicRules(text);
+  
+  // Update the syntax engine with the newly found tokens
+  editor.session.setMode(new NlpMode(dynamicRules));
+};
+
+// Trigger update on change (with debounce)
+let typingTimer;
+editor.on("change", () => {
+   runNlpUpdate()
+});
+
+// Initial run
+runNlpUpdate();
 </script>
 </body>
 </html>
