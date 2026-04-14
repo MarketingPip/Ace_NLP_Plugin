@@ -57,6 +57,9 @@ const getDynamicRules = (text) => {
       // Get unique text strings found for this pattern
       const foundWords = match.out('array');
       foundWords.forEach(word => {
+        if(word.includes("$")){
+          word = escapeRegex(word)
+        }
         activeRules.push({
           token: tokenMap[patterns[key]] || "text",
           regex: word
