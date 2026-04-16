@@ -46,6 +46,34 @@ const patterns = {
 
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\ factory\\]/g, '\\$&');
 
+/**
+ * Checks if a string contains any characters that need 
+ * escaping to be used literally in a Regular Expression.
+ */
+function needsRegexEscape(str) {
+  // We test against the "Dirty Dozen" metacharacters
+  const regexReservedChars = /[.*+?^${}()|[\]\\]/;
+  return regexReservedChars.test(str);
+}
+
+/**
+ * Escapes special regular expression characters in a string.
+ * * This is used to ensure that a string can be used as a literal pattern 
+ * within the `new RegExp()` constructor without its metacharacters 
+ * (like `*`, `?`, or `.`) being interpreted as commands.
+ *
+ * @param {string} str - The raw string containing potential regex characters.
+ * @returns {string} The escaped string safe for use in a RegExp.
+ * * @example
+ * const input = "Hello (world)?";
+ * const pattern = new RegExp(escapeRegex(input), "g");
+ * // pattern becomes /Hello \(world\)\?/g
+ */
+function escapeRegex(str) {
+  // The $& refers to the entire matched portion of the string
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+    
 // 2. The Logic: Convert the "patterns" keys into actual found words
 const getDynamicRules = (text) => {
   const doc = nlp(text);
